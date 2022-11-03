@@ -25,7 +25,7 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
-      image: "art-daq/otsdaq-base:latest"
+      image: "eflumerf/otsdaq-base:latest"
     defaults:
       run:
         shell: bash
@@ -36,7 +36,9 @@ jobs:
     
     - name: setup dev area
       run: |
-          source /opt/otsdaq/setup_ots.sh
+          cd /opt/otsdaq
+          source /opt/otsdaq/products/setup || true
+          source /opt/otsdaq/setup_ots.sh || true
           
     - name: checkout package for CI
       uses: actions/checkout@v3
@@ -48,9 +50,10 @@ jobs:
       run: |
           export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
           cd /opt/otsdaq
-          source setup_ots.sh
-          cp -pr $GITHUB_WORKSPACE/$REPO srcs
-          mrb b >$GITHUB_WORKSPACE/build.log 2>&1
+          source setup_ots.sh || true
+          cp -pr $GITHUB_WORKSPACE/art-daq/$REPO srcs
+          echo "Starting build"
+          mrb b 2>&1 | tee $GITHUB_WORKSPACE/build.log
 
 
     - name: upload build log file
