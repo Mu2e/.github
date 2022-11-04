@@ -1,0 +1,4 @@
+{
+    "name": "Test single package",
+    "description": "Build and test a single package, using UPS products in CVMFS"
+}
