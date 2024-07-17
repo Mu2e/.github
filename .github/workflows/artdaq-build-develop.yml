@@ -33,8 +33,14 @@ jobs:
         cd /opt/artdaq
         source /opt/artdaq/setupARTDAQDEMO
         
-        cd srcs
-        for pkg in */;do cd $pkg;git checkout develop;git pull;cd ..;done
+        spack cd --env
+        for pkg in */;do 
+            echo "Updating package $pkg"
+            cd $pkg
+            git checkout develop
+            git pull
+            cd ..
+        done
         cd /opt/artdaq
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
@@ -43,7 +49,8 @@ jobs:
         echo "Starting build"
         spack install | tee /scratch/art-daq/build.log
         res=$?
-
+        
+        echo "Spack install completed with status code $res"
         echo "Spack install completed with status code $res" >>/scratch/art-daq/build.log
 
         exit $?
