@@ -37,7 +37,9 @@ jobs:
         for pkg in */;do 
             echo "Updating package \$pkg"
             cd \$pkg
+            git stash
             git checkout develop
+            git stash pop
             git pull
             cd ..
         done
