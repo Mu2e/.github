@@ -47,7 +47,7 @@ jobs:
         cp -pr /scratch/art-daq/$REPO srcs
 
         echo "Starting build"
-        spack install | tee /scratch/art-daq/build.log
+        spack install
         res=\$?
         
         echo "Spack install completed with status code \$res"
@@ -63,8 +63,3 @@ jobs:
       run: |
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
     
-    - name: upload build log file
-      uses: actions/upload-artifact@main
-      with:
-        name: build_log
-        path: ${{ github.workspace }}/scratch/art-daq/build.log
