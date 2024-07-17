@@ -1,4 +1,0 @@
-{
-    "name": "Artdaq develop CI",
-    "description": "Builds all artdaq packages together in an MRB area"
-}
