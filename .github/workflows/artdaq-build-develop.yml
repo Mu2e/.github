@@ -46,9 +46,10 @@ jobs:
         cd /opt/artdaq
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        cp -pr /scratch/art-daq/$REPO srcs
+        cp -pr /scratch/art-daq/\$REPO srcs
 
         echo "Starting build"
+        spack uninstall -y --dependents artdaq  artdaq-core  artdaq-core-demo  artdaq-daqinterface  artdaq-database  artdaq-demo  artdaq-epics-plugin  artdaq-mfextensions  artdaq-utilities trace
         spack install
         res=\$?
         
