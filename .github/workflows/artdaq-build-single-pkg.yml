@@ -46,12 +46,12 @@ jobs:
         source /opt/artdaq/setupARTDAQDEMO || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        echo "Copying /scratch/art-daq/\$REPO to environment ${REPO//_/-}"
+        echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
         spack cd --env
-        cp -pr /scratch/art-daq/\$REPO ${REPO//_/-}
+        cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
         
-        spack cd -b ${REPO//_/-}
-        spack build-env ${REPO//_/-} make | tee /scratch/art-daq/build.log
+        spack cd -b \${REPO//_/-}
+        spack build-env \${REPO//_/-} make | tee /scratch/art-daq/build.log
         
         exit \$?
         EOT
