@@ -55,7 +55,7 @@ jobs:
         
         spack load gcc@13.1.0 >/dev/null 2>&1
         if [ \$? -ne 0 ];then
-          spack install -j $BUILD_J gcc@13.1.0 +binutils
+          spack install gcc@13.1.0 arch=linux-almalinux9-x86_64_v3 +binutils
           spack load gcc@13.1.0
         fi
         spack compiler find
