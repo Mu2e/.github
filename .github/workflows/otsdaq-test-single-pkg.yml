@@ -1,4 +1,4 @@
-name: Test Single Pkg Workflow
+name: Test Single Pkg Workflow (otsdaq version)
 
 on:
   workflow_call:
@@ -11,6 +11,9 @@ jobs:
     
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+    - name: Delete huge unnecessary tools folder
+      run: rm -rf /opt/hostedtoolcache
+
     - uses: cvmfs-contrib/github-action-cvmfs@main
 
     - name: change dir permission
@@ -43,22 +46,32 @@ jobs:
         #!/bin/bash
         
         cd /opt/artdaq
-        source /opt/artdaq/setupARTDAQDEMO || exit 1
+        source /opt/artdaq/setup_ots.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        echo "Copying /scratch/art-daq/\$REPO to environment ${REPO//_/-}"
+        echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
         spack cd --env
-        cp -pr /scratch/art-daq/\$REPO ${REPO//_/-}
+        cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
         
-        spack cd -b ${REPO//_/-}
-        spack build-env ${REPO//_/-} make && make test | tee /scratch/art-daq/build.log
+        spack load gcc@13.1.0 && spack compiler find
 
-        exit \$?
+        spack cd -b \${REPO//_/-}
+        spack build-env \${REPO//_/-} make && make test | tee /scratch/art-daq/build.log
+        res=\$?
+        
+        echo "Spack install completed with status code \$res"
+        echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
+
+        exit \$res
         EOT
         chmod +x build_pkg.sh
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/otsdaq-spack:latest /scratch/build_pkg.sh
         
+    - name: Check build log for success
+      run: |
+        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/art-daq/build.log
+
     - name: upload build log file
       uses: actions/upload-artifact@main
       with:

@@ -1,4 +1,4 @@
-name: build-develop
+name: Build otsdaq suite against develop
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -48,7 +48,7 @@ jobs:
         #!/bin/bash
         
         cd /opt/artdaq
-        source /opt/artdaq/setupARTDAQDEMO || exit 1
+        source /opt/artdaq/setup_ots.sh || exit 1
         
         echo "Checking out develop"
         spack cd --env
@@ -76,7 +76,7 @@ jobs:
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/art-daq/build.log
 
-        exit \$?
+        exit \$res
         EOT
         chmod +x build_pkg.sh
 
