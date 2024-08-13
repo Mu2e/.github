@@ -68,6 +68,9 @@ jobs:
         echo "Copying /scratch/art-daq/\$REPO to environment \$SPACK_PACAKGE"
         spack cd --env
         cp -pr /scratch/art-daq/\$REPO \$SPACK_PACKAGE
+        
+        spack arch
+        spack load gcc@13.1.0 && spack compiler find
 
         echo "Starting build"
         spack install
