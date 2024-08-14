@@ -53,9 +53,7 @@ jobs:
         spack cd --env
         cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
         
-        spack arch
-        spack load gcc@13.1.0 && spack compiler find
-
+        spack install
         spack cd -b \${REPO//_/-}
         spack build-env \${REPO//_/-} make && make test | tee /scratch/art-daq/build.log
         res=\$?
