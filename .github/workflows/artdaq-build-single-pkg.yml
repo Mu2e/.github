@@ -52,16 +52,9 @@ jobs:
         echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
         spack cd --env
         cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
-
-        echo "Spack arch is:"
-        spack arch
-        echo
-
-        echo "Spack package listing:"
-        spack find
-
-        spack load gcc@13.1.0 || exit 1
         
+        which g++
+
         spack cd -b \${REPO//_/-}
         spack build-env \${REPO//_/-} make | tee /scratch/art-daq/build.log
         
