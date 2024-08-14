@@ -62,12 +62,12 @@ jobs:
             cd ..
         done
         cd /opt/artdaq
-
+        
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        export SPACK_PACKAGE=`echo \$REPO|sed 's/_/-/g'`
-        echo "Copying /scratch/art-daq/\$REPO to environment \$SPACK_PACAKGE"
+        echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
         spack cd --env
-        cp -pr /scratch/art-daq/\$REPO \$SPACK_PACKAGE
+        rm \${REPO//_/-}
+        cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
         
         echo "Starting build"
         spack install

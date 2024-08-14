@@ -51,6 +51,7 @@ jobs:
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
         spack cd --env
+        rm \${REPO//_/-}
         cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
         
         spack install
