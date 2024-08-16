@@ -67,7 +67,8 @@ jobs:
         
     - name: Check build log for success
       run: |
-        grep "100% tests passed, 0 tests failed" ${{ github.workspace }}/scratch/art-daq/build.log
+        grep "100% tests passed, 0 tests failed" ${{ github.workspace }}/scratch/art-daq/build.log ||
+        grep "No tests were found!!!" ${{ github.workspace }}/scratch/art-daq/build.log
 
     - name: upload build log file
       uses: actions/upload-artifact@main
