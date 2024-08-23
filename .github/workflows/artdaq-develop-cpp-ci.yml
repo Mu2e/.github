@@ -68,7 +68,11 @@ jobs:
         cd srcs
         if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
         cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
-        
+                
+        # Have to re-add here in case architecture is different
+        cd /opt/artdaq
+        spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
+
         echo "Starting build"
         spack mpd build
         res=\$?
