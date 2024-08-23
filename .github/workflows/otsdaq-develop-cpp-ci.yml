@@ -51,7 +51,7 @@ jobs:
         source /opt/artdaq/setup_ots.sh || exit 1
         
         echo "Checking out develop"
-        spack cd --env
+        cd srcs
         for pkg in */;do 
             echo "Updating package \$pkg"
             cd \$pkg
@@ -65,12 +65,12 @@ jobs:
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
-        spack cd --env
+        cd srcs
         if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
         cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
         
         echo "Starting build"
-        spack install
+        spack mpd build
         res=\$?
         
         echo "Spack install completed with status code \$res"
