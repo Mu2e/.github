@@ -58,7 +58,7 @@ jobs:
         cd /opt/artdaq
         spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
         
-        spack mpd build       
+        spack mpd build 2>&1 | tee -a /scratch/art-daq/build.log
         res=\$?
         
         echo "Spack install completed with status code \$res"

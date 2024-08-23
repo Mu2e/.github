@@ -58,7 +58,7 @@ jobs:
         cd /opt/artdaq
         spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
         
-        spack mpd test
+        spack mpd test 2>&1 | tee -a /scratch/art-daq/build.log
         res=\$?
         
         exit \$res
