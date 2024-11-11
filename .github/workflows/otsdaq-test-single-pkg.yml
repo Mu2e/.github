@@ -63,7 +63,7 @@ jobs:
         spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
                 
         spack mpd test 2>&1 | tee -a /scratch/art-daq/build.log
-        res=\$?
+        res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
 
         exit \$res
         EOT
