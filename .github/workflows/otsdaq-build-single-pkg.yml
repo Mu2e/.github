@@ -34,7 +34,7 @@ jobs:
 
     - name: test cvmfs
       run: |
-        ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/artdaq_spack
+        ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
     
     - name: Checkout pkg
       uses: actions/checkout@main
@@ -49,8 +49,8 @@ jobs:
         cat << EOT > build_pkg.sh
         #!/bin/bash
         
-        cd /opt/artdaq
-        source /opt/artdaq/setup_ots.sh || exit 1
+        cd /opt/otsdaq
+        source /opt/otsdaq/setup_ots.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         echo "Copying /scratch/art-daq/\$REPO to environment \${REPO//_/-}"
@@ -59,8 +59,8 @@ jobs:
         cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
                 
         # Have to re-add here in case architecture is different
-        cd /opt/artdaq
-        spack config add config:mpd_user_dir:/opt/artdaq/spack-repos/mpd/
+        cd /opt/otsdaq
+        spack config add config:mpd_user_dir:/opt/otsdaq/spack-repos/mpd/
         
         spack mpd build 2>&1 | tee -a /scratch/art-daq/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
