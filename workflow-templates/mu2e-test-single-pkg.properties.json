@@ -1,0 +1,4 @@
+{
+    "name": "Run the unit tests",
+    "description": "Runs the unit tests of an mu2e-tdaq-suite development area"
+}
