@@ -53,10 +53,6 @@ jobs:
         
         cd /opt/mu2edaq
         source /opt/mu2edaq/setup_ots.sh || exit 1
-        spack bootstrap now
-        spack load --first gcc@13.1.0
-        spack compilers
-        spack compiler find
         
         echo "Checking out develop"
         cd srcs
@@ -81,8 +77,6 @@ jobs:
         cd /opt/mu2edaq
         #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
-
-        cd spack-mpd;git pull;cd ..
         
         echo "Starting build"
         spack mpd build 2>&1 | tee -a /scratch/Mu2e/build.log
