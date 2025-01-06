@@ -60,7 +60,7 @@ jobs:
             echo "Updating package \$pkg"
             cd \$pkg
             git stash
-            git checkout develop
+            git checkout develop || git checkout main
             git stash pop
             git pull
             cd ..
