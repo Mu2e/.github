@@ -53,6 +53,7 @@ jobs:
         
         cd /opt/mu2edaq
         source /opt/mu2edaq/setup_ots.sh || exit 1
+        spack bootstrap now
         
         echo "Checking out develop"
         cd srcs
