@@ -54,6 +54,9 @@ jobs:
         cd /opt/mu2edaq
         source /opt/mu2edaq/setup_ots.sh || exit 1
         spack bootstrap now
+        spack load --first gcc@13.1.0
+        spack compilers
+        spack compiler find
         
         echo "Checking out develop"
         cd srcs
