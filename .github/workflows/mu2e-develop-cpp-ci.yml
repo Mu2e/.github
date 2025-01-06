@@ -79,7 +79,8 @@ jobs:
         #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
 
-        spack mpd status
+        cd spack-mpd;git pull;cd ..
+        
         echo "Starting build"
         spack mpd build 2>&1 | tee -a /scratch/Mu2e/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
