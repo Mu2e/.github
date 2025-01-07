@@ -65,7 +65,9 @@ jobs:
         #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
         
+        spack env deactivate
         spack mpd refresh
+        spack env activate tdaq-develop
         
         echo "Starting build"
         spack mpd build -G Ninja --clean 2>&1 | tee -a /scratch/Mu2e/build.log
