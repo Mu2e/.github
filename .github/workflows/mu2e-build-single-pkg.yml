@@ -64,13 +64,18 @@ jobs:
         ls
                 
         # Have to re-add here in case architecture is different
+        echo "Re-setting configuration"
         cd /opt/mu2edaq
         spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
 
+        echo "Refreshing project (env deactivate)"
         spack env deactivate
+        echo "Refreshing project (selecting project)"
         spack mpd select tdaq-develop
+        echo "Refreshing project (mpd refresh && env activate)"
         spack mpd refresh && spack env activate tdaq-develop
         
+        echo "Starting build"
         spack mpd build -G Ninja --clean 2>&1 | tee -a /scratch/Mu2e/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         
