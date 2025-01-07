@@ -66,7 +66,10 @@ jobs:
         # Have to re-add here in case architecture is different
         echo "Re-setting configuration"
         cd /opt/mu2edaq
-        spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
+        #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
+        spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
+
+        spack mpd list
 
         echo "Refreshing project (env deactivate)"
         spack env deactivate
