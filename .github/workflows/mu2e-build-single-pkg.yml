@@ -55,28 +55,17 @@ jobs:
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         echo "Copying /scratch/Mu2e/\$REPO to environment \${REPO//_/-}"
         cd srcs
-        echo "ls of srcs:"
-        ls
         rm -rf */
         if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
         cp -pr /scratch/Mu2e/\$REPO \${REPO//_/-}
-        echo "ls of srcs:"
-        ls
                 
         # Have to re-add here in case architecture is different
         echo "Re-setting configuration"
         cd /opt/mu2edaq
         #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
-
-        spack mpd list
-
-        echo "Refreshing project (env deactivate)"
-        spack env deactivate
-        echo "Refreshing project (selecting project)"
-        spack mpd select tdaq-develop
-        echo "Refreshing project (mpd refresh && env activate)"
-        spack mpd refresh && spack env activate tdaq-develop
+        
+        spack mpd refresh
         
         echo "Starting build"
         spack mpd build -G Ninja --clean 2>&1 | tee -a /scratch/Mu2e/build.log
