@@ -58,7 +58,7 @@ jobs:
         rm -rf */
         if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
         cp -pr /scratch/Mu2e/\$REPO \${REPO//_/-}
-        ls srcs/*
+        ls */*
                 
         # Have to re-add here in case architecture is different
         echo "Re-setting configuration"
@@ -67,8 +67,7 @@ jobs:
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
         
         spack env deactivate
-        spack mpd refresh
-        spack env activate tdaq-develop
+        spack mpd new-project --force -y --name tdaq-develop -E `spack env list|grep tdaq-|grep -v tdaq-develop` cxxstd=20 %gcc@13.1.0
         
         echo "Starting build"
         spack mpd build -G Ninja --clean 2>&1 | tee -a /scratch/Mu2e/build.log
