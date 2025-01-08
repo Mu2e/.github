@@ -53,23 +53,17 @@ jobs:
         source /opt/mu2edaq/setup_ots.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        echo "Copying /scratch/Mu2e/\$REPO to environment \${REPO//_/-}"
-        mkdir single-pkg;cd single-pkg
-        if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
-        cp -pr /scratch/Mu2e/\$REPO \${REPO//_/-}
-        
-        # Have to re-add here in case architecture is different
-        cd /opt/mu2edaq
-        spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
-        spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
+        mkdir /scratch/Mu2e/build_\$REPO
+        cd /scratch/Mu2e/build_\$REPO
 
-        spack env deactivate
-        spack mpd clear
-        spack mpd new-project -f -y --name single-pkg -S single-pkg -E tdaq-develop cxxstd=20 %gcc@13.1.0
+        compiler=`spack compiler info gcc@13.1.0|grep cxx|cut -d= -f2|xargs`
+        cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
+        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler
         
-        spack mpd build -G Ninja --clean # 2>&1 | tee -a /scratch/Mu2e/build.log
+        echo "Starting build"
+        make 2>&1 | tee -a /scratch/Mu2e/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
-        
+
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/Mu2e/build.log
         
