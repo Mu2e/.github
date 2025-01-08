@@ -24,9 +24,7 @@ jobs:
     - name: Check for whitespace errors using Git
       run: |
         cd scratch/${{ github.repository }}
-
-        git log
-
+        
         cat << EOT > check_whitespace.sh
         #!/bin/bash
 
