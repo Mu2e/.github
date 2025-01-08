@@ -55,10 +55,8 @@ jobs:
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         mkdir /scratch/Mu2e/build_\$REPO
         cd /scratch/Mu2e/build_\$REPO
-
-        spack compiler info gcc@13.1.0
-        spack compiler info gcc@13.1.0|grep cxx
-        export compiler=`spack compiler info gcc@13.1.0|grep cxx|awk '{print $3}'`
+        
+        export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print $3}')
         echo "Compiler is \$compiler"
         cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
         echo "Configuring with cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler"
