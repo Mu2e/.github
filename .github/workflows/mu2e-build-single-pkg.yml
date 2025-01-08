@@ -1,4 +1,4 @@
-name: Build Single Pkg Workflow (otsdaq version)
+name: Build Single Pkg Workflow (Mu2e version)
 
 on:
   workflow_call:
