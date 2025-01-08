@@ -57,7 +57,9 @@ jobs:
         cd /scratch/Mu2e/build_\$REPO
 
         export compiler=`spack compiler info gcc@13.1.0|grep cxx|cut -d= -f2|xargs`
+        echo "Compiler is $compiler"
         cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
+        echo "Configuring with cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler"
         cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler
         
         echo "Starting build"
