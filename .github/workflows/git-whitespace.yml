@@ -27,6 +27,7 @@ jobs:
         if [ "x$against" == "x" ]; then
             against=$(git hash-object -t tree /dev/null)
         fi
+        echo "Checking for whitespace differences introduced since commit $against"
         
         # Cross platform projects tend to avoid non-ASCII filenames; prevent
         # them from being added to the repository. We exploit the fact that the
