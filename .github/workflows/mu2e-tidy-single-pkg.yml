@@ -1,0 +1,107 @@
+name: Run Clang-Tidy Workflow (Mu2e version)
+
+on:
+  workflow_call:
+    inputs:
+        against-ref:
+            required: false
+            type: string
+
+jobs:
+
+ tidy_single_pkg:
+    name: tidy single pkg
+    runs-on: ubuntu-latest
+    
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Delete huge unnecessary tools folder
+      run: rm -rf /opt/hostedtoolcache
+
+    - uses: cvmfs-contrib/github-action-cvmfs@main
+
+    - name: change dir permission
+      run: |
+        sudo chmod -R go+rwx /var/lib/cvmfs
+
+    - name: Cache cvmfs cache
+      id: cvmfs_cache
+      uses: actions/cache@main
+      with:
+        path: /var/lib/cvmfs/shared
+        key: cachecvmfs
+
+    - name: restore dir permission
+      run: |
+        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
+        sudo chmod -R go-rwx /var/lib/cvmfs
+
+    - name: test cvmfs
+      run: |
+        ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
+    
+    - name: Checkout pkg
+      uses: actions/checkout@main
+      with:
+        repository: ${{ github.repository }}
+        path: scratch/${{ github.repository }}
+
+    - name: run clang-tidy in docker container with cvmfs bind mount
+      run: |
+      
+        cd $GITHUB_WORKSPACE/scratch
+        cat << EOT > build_pkg.sh
+        #!/bin/bash
+        
+        cd /opt/mu2edaq
+        source /opt/mu2edaq/setup_ots.sh || exit 1
+        
+        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+        
+        against=${{ inputs.against-ref }}
+        if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
+            against=\$(git hash-object -t tree /dev/null)
+        fi
+        echo "Collecting changed files since commit \$against"
+        cd /scratch/Mu2e/\$REPO
+        names=\$( git diff --cached --name-only --diff-filter=AM  \$against )
+
+        mkdir /scratch/Mu2e/build_\$REPO
+        cd /scratch/Mu2e/build_\$REPO
+        
+        spack load llvm
+        spack compiler find
+
+        export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
+        echo "Compiler is \$compiler"
+        cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
+        echo "Configuring with cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        
+        echo "Running clang-tidy on changed files"
+        run-clang-tidy -quiet \$names  2>&1 | tee -a /scratch/Mu2e/build.log
+        res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+
+        echo "Clang-tidy completed with status code \$res"
+        echo "Clang-tidy completed with status code \$res" >>/scratch/Mu2e/build.log
+        
+        exit \$res
+        EOT
+        chmod +x build_pkg.sh
+        cat build_pkg.sh
+
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/mu2e-spack:latest /scratch/build_pkg.sh
+        
+    - name: Check build log for success
+      run: |
+        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log
+
+    - name: upload build log file
+      uses: actions/upload-artifact@main
+      with:
+        name: build_log
+        path: ${{ github.workspace }}/scratch/Mu2e/build.log
+
+    - name: change dir permission again
+      run: |
+        sudo chmod -R go+rwx /var/lib/cvmfs
