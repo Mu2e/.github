@@ -60,7 +60,7 @@ jobs:
         echo "Compiler is \$compiler"
         cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
         echo "Configuring with cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler"
-        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler
+        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev
         
         echo "Starting build"
         make 2>&1 | tee -a /scratch/Mu2e/build.log

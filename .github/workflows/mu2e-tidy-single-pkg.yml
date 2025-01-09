@@ -77,7 +77,7 @@ jobs:
         echo "Compiler is \$compiler"
         cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
         echo "Configuring with cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
-        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
         
         echo "Running clang-tidy on changed files"
         run-clang-tidy -quiet \$names  2>&1 | tee -a /scratch/Mu2e/build.log
