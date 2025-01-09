@@ -65,7 +65,7 @@ jobs:
         fi
         echo "Collecting changed files since commit \$against, in git repository ${{ github.repository }}"
         cd /scratch/${{ github.repository }}
-        pwd
+        ls -la
         names=\$( git diff --name-only --diff-filter=AM  \$against )
 
         mkdir /scratch/Mu2e/build_\$REPO
