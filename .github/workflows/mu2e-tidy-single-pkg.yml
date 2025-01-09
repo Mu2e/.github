@@ -63,8 +63,9 @@ jobs:
         if [ "x\$against" == "x" ] || [ "x\$against" == "x0" ]; then
             against=\$(git hash-object -t tree /dev/null)
         fi
-        echo "Collecting changed files since commit \$against"
+        echo "Collecting changed files since commit \$against, in git repository ${{ github.repository }}"
         cd /scratch/${{ github.repository }}
+        pwd
         names=\$( git diff --name-only --diff-filter=AM  \$against )
 
         mkdir /scratch/Mu2e/build_\$REPO
