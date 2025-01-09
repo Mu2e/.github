@@ -64,9 +64,7 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Collecting changed files since commit \$against, in git repository ${{ github.repository }}"
-        cd /scratch/${{ github.repository }}
-        ls -la
-        names=\$( git diff --name-only --diff-filter=AM  \$against )
+        names=\$( cd /scratch/${{ github.repository }};git diff --name-only --diff-filter=AM  \$against )
 
         mkdir /scratch/Mu2e/build_\$REPO
         cd /scratch/Mu2e/build_\$REPO
