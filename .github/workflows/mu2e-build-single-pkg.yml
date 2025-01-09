@@ -81,6 +81,7 @@ jobs:
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log
 
     - name: upload build log file
+      if: always()
       uses: actions/upload-artifact@main
       with:
         name: build_log
