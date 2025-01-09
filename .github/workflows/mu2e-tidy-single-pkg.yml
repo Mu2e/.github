@@ -64,7 +64,7 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Collecting changed files since commit \$against"
-        cd /scratch/Mu2e/\$REPO
+        cd /scratch/${{ github.repository }}
         names=\$( git diff --name-only --diff-filter=AM  \$against )
 
         mkdir /scratch/Mu2e/build_\$REPO
@@ -75,9 +75,9 @@ jobs:
 
         export compiler=\$(spack compiler info clang|grep cxx|grep llvm|awk '{print \$3}'|tail -1)
         echo "Compiler is \$compiler"
-        cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/Mu2e/\$REPO
-        echo "Configuring with cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
-        cmake --preset default /scratch/Mu2e/\$REPO -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
+        cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
+        echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+        cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -Wno-dev
         
         echo "Running clang-tidy on changed files"
         run-clang-tidy -quiet \$names  2>&1 | tee -a /scratch/Mu2e/build.log
