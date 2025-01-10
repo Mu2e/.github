@@ -105,7 +105,8 @@ jobs:
         
     - name: Check build log for success
       run: |
-        grep "Clang-tidy completed with status code \$res" ${{ github.workspace }}/scratch/Mu2e/build.log
+        grep "Clang-tidy completed with status code \$res" ${{ github.workspace }}/scratch/Mu2e/build.log ||
+        grep "No changed files" ${{ github.workspace }}/scratch/Mu2e/build.log
 
     - name: upload build log file
       if: always()
