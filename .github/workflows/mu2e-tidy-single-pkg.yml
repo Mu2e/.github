@@ -62,7 +62,7 @@ jobs:
 
         if [ "x$names" == "x" ]; then
             echo "No changed files"
-            echo "No changed files" >Mu2e/build.log
+            echo "No changed files" >$GITHUB_WORKSPACE/scratch/Mu2e/build.log
             return 0
         fi
 
