@@ -64,7 +64,9 @@ jobs:
             against=\$(git hash-object -t tree /dev/null)
         fi
         echo "Collecting changed files since commit \$against, in git repository ${{ github.repository }}"
-        names=\$( cd /scratch/${{ github.repository }};git diff --name-only --diff-filter=AM  \$against )
+        cd /scratch/${{ github.repository }}
+        git diff --name-only --diff-filter=AM  \$against
+        names=\$( git diff --name-only --diff-filter=AM  \$against )
 
         mkdir /scratch/Mu2e/build_\$REPO
         cd /scratch/Mu2e/build_\$REPO
@@ -88,12 +90,13 @@ jobs:
         exit \$res
         EOT
         chmod +x build_pkg.sh
+        cat build_pkg.sh
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/mu2e-spack:latest /scratch/build_pkg.sh
         
     - name: Check build log for success
       run: |
-        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log
+        grep "Clang-tidy completed with status code \$res" ${{ github.workspace }}/scratch/Mu2e/build.log
 
     - name: upload build log file
       if: always()
