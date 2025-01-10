@@ -59,6 +59,13 @@ jobs:
         echo "Collecting changed files since commit $against, in git repository ${{ github.repository }}"
         cd ${{ github.repository }}
         names=$( git diff --cached --name-only --diff-filter=AM  $against )
+
+        if [ "x$names" == "x" ]; then
+            echo "No changed files"
+            echo "No changed files" >Mu2e/build.log
+            return 0
+        fi
+
         cd $GITHUB_WORKSPACE/scratch
 
         cat << EOT > build_pkg.sh
@@ -68,7 +75,7 @@ jobs:
         source /opt/mu2edaq/setup_ots.sh || exit 1
         
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        names=$names
+        names="$names"
         
         mkdir /scratch/Mu2e/build_\$REPO
         cd /scratch/Mu2e/build_\$REPO
