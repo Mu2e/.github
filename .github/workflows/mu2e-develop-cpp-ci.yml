@@ -54,24 +54,30 @@ jobs:
         cd /opt/mu2edaq
         source /opt/mu2edaq/setup_ots.sh || exit 1
         
-        echo "Checking out develop"
+        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
+        echo "Copying /scratch/art-daq/\$REPO to srcs \${REPO//_/-}"
         cd srcs
+        if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
+        cp -pr /scratch/art-daq/\$REPO \${REPO//_/-}
+        cd \${REPO//_/-}
+        ref=`git describe --all`
+        branch=develop
+
+        if [[ ${ref} =~ "heads/" ]]; then
+            branch=${ref//heads\//}
+        fi
+
+        echo "Checking out $branch"
+        cd  /opt/mu2edaq/srcs
         for pkg in */;do 
             echo "Updating package \$pkg"
             cd \$pkg
             git stash
-            git checkout develop || git checkout main
+            git checkout $branch
             git stash pop
             git pull
             cd ..
         done
-        cd /opt/mu2edaq
-        
-        export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
-        echo "Copying /scratch/${{ github.repository }} to environment \${REPO//_/-}"
-        cd srcs
-        if [ -d \${REPO//_/-} ];then mv \${REPO//_/-}{,.bak}; fi
-        cp -pr /scratch/${{ github.repository }} \${REPO//_/-}
                 
         # Have to re-add here in case architecture is different
         cd /opt/mu2edaq
