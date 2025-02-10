@@ -63,7 +63,6 @@ jobs:
         cp -pr /scratch/Mu2e/\$REPO \$pkgname
         cd \$pkgname
         git config --global --add safe.directory \$PWD
-        git describe --all
         export ref=\$(git describe --all)
         echo "Described current ref as \${ref}"
         branch=develop
