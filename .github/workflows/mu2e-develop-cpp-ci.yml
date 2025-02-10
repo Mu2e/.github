@@ -64,8 +64,11 @@ jobs:
         ls -l
         cd \$pkgname
         ls -la
+        git status
+        git describe --all
+        git symbolic-ref HEAD
         export ref=`git describe --all`
-        echo "Described current ref as `git describe --all`"
+        echo "Described current ref as \${ref}"
         branch=develop
         
         if [[ "x\${ref}" =~ "xheads/" ]]; then
