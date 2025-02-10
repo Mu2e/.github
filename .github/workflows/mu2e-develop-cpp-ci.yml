@@ -61,7 +61,9 @@ jobs:
         cd srcs
         if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
         cp -pr /scratch/Mu2e/\$REPO \$pkgname
+        ls -l
         cd \$pkgname
+        ls -la
         export ref=`git describe --all`
         echo "Described current ref as `git describe --all`"
         branch=develop
