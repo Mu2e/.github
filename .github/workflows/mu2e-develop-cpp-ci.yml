@@ -64,7 +64,7 @@ jobs:
         cd \$pkgname
         git config --global --add safe.directory \$PWD
         git describe --all
-        export ref=`git describe --all`
+        export ref=\$(git describe --all)
         echo "Described current ref as \${ref}"
         branch=develop
         
