@@ -64,6 +64,7 @@ jobs:
         ls -l
         cd \$pkgname
         ls -la
+        git config --global --add safe.directory \$PWD
         git status
         git describe --all
         git symbolic-ref HEAD
