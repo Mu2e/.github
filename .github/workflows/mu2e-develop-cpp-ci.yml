@@ -62,7 +62,8 @@ jobs:
         if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
         cp -pr /scratch/Mu2e/\$REPO \$pkgname
         cd \$pkgname
-        ref=`git describe --all`
+        export ref=`git describe --all`
+        echo "Described current ref as `git describe --all`"
         branch=develop
         
         if [[ "x\${ref}" =~ "xheads/" ]]; then
