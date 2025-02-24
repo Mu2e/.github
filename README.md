@@ -2,7 +2,7 @@
 
 # Repo Action Status
 
-<details>
+<details open>
   <summary>Core Repositories</summary>
 
 ## [artdaq-core-mu2e](https://github.com/Mu2e/artdaq_core_mu2e)
@@ -47,7 +47,7 @@
  
 </details>
 
-<details>
+<details open>
   <summary>Subsystem Repositories</summary>
   
 ## [otsdaq-mu2e-calorimeter](https://github.com/Mu2e/otsdaq_mu2e_calorimeter)
@@ -122,7 +122,7 @@
 
 </details>
 
-<details>
+<details open>
   <summary>Configuration, Operations, CI</summary>
   
 ## [otsdaq-mu2e-config](https://github.com/Mu2e/otsdaq_mu2e_config)
