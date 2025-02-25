@@ -62,6 +62,12 @@ jobs:
       if: steps.cache-docker-mu2e.outputs.cache-hit == 'true'
       run: docker image load --input ./ci/cache/docker/mu2e/mu2e-latest.tar
 
+    - name: Check for Mu2e Image Cache Updates
+      if: steps.cache-docker-mu2e.outputs.cache-hit == 'true'
+      run: |
+        newimage=`docker pull eflumerf/mu2e-spack:latest | grep -c  "Status: Downloaded newer image"`
+        [ $newimage -eq 1 ] && docker image save eflumerf/mu2e-spack:latest --output ./ci/cache/docker/mu2e/mu2e-latest.tar
+
     - name: run clang-tidy in docker container with cvmfs bind mount
       run: |
       

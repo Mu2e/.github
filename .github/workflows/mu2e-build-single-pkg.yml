@@ -51,7 +51,7 @@ jobs:
 
     - name: Update Mu2e Image Cache if cache miss
       if: steps.cache-docker-mu2e.outputs.cache-hit != 'true'
-      run: docker pull eflumerf/mu2e-spack:latest && mkdir -p ci/cache/docker/mu2e && docker image save eflumerf/mu2e-spack:latest --output ./ci/cache/docker/mu2e/mu2e-latest.tar
+      run: docker pull mu2e:5.7 && mkdir -p ci/cache/docker/mu2e && docker image save eflumerf/mu2e-spack:latest --output ./ci/cache/docker/mu2e/mu2e-latest.tar
 
     - name: Use Mu2e Image Cache if cache hit
       if: steps.cache-docker-mu2e.outputs.cache-hit == 'true'
