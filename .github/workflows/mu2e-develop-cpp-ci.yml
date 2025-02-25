@@ -45,6 +45,21 @@ jobs:
         path: scratch/${{ github.repository }}
         fetch-depth: 0
 
+    - name: Restore Mu2e Image Cache if it exists
+      id: cache-docker-mu2e
+      uses: actions/cache@v3
+      with:
+        path: ci/cache/docker/mu2e
+        key: cache-docker-mu2e
+
+    - name: Update Mu2e Image Cache if cache miss
+      if: steps.cache-docker-mu2e.outputs.cache-hit != 'true'
+      run: docker pull eflumerf/mu2e-spack:latest && mkdir -p ci/cache/docker/mu2e && docker image save eflumerf/mu2e-spack:latest --output ./ci/cache/docker/mu2e/mu2e-latest.tar
+
+    - name: Use Mu2e Image Cache if cache hit
+      if: steps.cache-docker-mu2e.outputs.cache-hit == 'true'
+      run: docker image load --input ./ci/cache/docker/mu2e/mu2e-latest.tar
+
     - name: run build in docker container with cvmfs bind mount
       run: |
       
