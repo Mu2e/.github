@@ -16,22 +16,6 @@ jobs:
 
     - uses: cvmfs-contrib/github-action-cvmfs@main
 
-    - name: change dir permission
-      run: |
-        sudo chmod -R go+rwx /var/lib/cvmfs
-
-    - name: Cache cvmfs cache
-      id: cvmfs_cache
-      uses: actions/cache@main
-      with:
-        path: /var/lib/cvmfs/shared
-        key: cachecvmfs
-
-    - name: restore dir permission
-      run: |
-        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
-        sudo chmod -R go-rwx /var/lib/cvmfs
-
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
@@ -41,6 +25,34 @@ jobs:
       with:
         repository: ${{ github.repository }}
         path: scratch/${{ github.repository }}
+        fetch-depth: 0
+
+    - name: Fetch package version
+      id: version
+      run: |
+        cd $GITHUB_WORKSPACE/scratch/${{ github.repository }}
+        tag=`git describe --tags --abbrev=0`
+        echo "Using tag $tag"
+        echo "tag=${tag}" >>$GITHUB_OUTPUT
+
+    - name: change dir permission
+      run: |
+        sudo chmod -R go+rwx /var/lib/cvmfs
+
+    - name: Cache cvmfs cache
+      id: cvmfs_cache
+      uses: actions/cache@main
+      with:
+        path: /var/lib/cvmfs/shared
+        key: cachecvmfs-${{ steps.version.outputs.tag }}
+
+    - name: restore dir permission
+      run: |
+        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
+        sudo chmod -R go-rwx /var/lib/cvmfs
+        
+    - name: Pull current Docker image
+      run: docker image pull eflumerf/mu2e-spack:latest
 
     - name: run build in docker container with cvmfs bind mount
       run: |
@@ -56,15 +68,22 @@ jobs:
         mkdir /scratch/Mu2e/build_\$REPO
         cd /scratch/Mu2e/build_\$REPO
         
+        export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         export compiler=\$(spack compiler info gcc@13.1.0|grep cxx|awk '{print \$3}')
         echo "Compiler is \$compiler"
         cp /opt/mu2edaq/srcs/CMakePresets.json /scratch/${{ github.repository }}
         echo "Configuring with cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler"
         cmake --preset default /scratch/${{ github.repository }} -DCMAKE_CXX_COMPILER=\$compiler -Wno-dev
         
-        echo "Starting tests"
-        make test 2>&1 | tee -a /scratch/Mu2e/build.log
+        echo "Compiling code"
+        make -j\$CETPKG_J 2>&1 | tee -a /scratch/Mu2e/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        
+        if [ \$res -eq 0 ]; then
+            echo "Starting tests"
+            make test 2>&1 | tee -a /scratch/Mu2e/build.log
+            res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        fi
 
         exit \$res
         EOT
