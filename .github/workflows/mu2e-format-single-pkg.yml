@@ -18,6 +18,9 @@ jobs:
     - name: Delete huge unnecessary tools folder
       run: rm -rf /opt/hostedtoolcache
 
+    - name: SUID for tar
+      run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
+
     - uses: cvmfs-contrib/github-action-cvmfs@main
 
     - name: test cvmfs
@@ -41,7 +44,8 @@ jobs:
 
     - name: change dir permission
       run: |
-        sudo chmod -R go+rwx /var/lib/cvmfs
+        sudo mkdir -p /var/lib/cvmfs
+        sudo chmod -R 777 /var/lib/cvmfs
 
     - name: Cache cvmfs cache
       id: cvmfs_cache
@@ -52,8 +56,8 @@ jobs:
 
     - name: restore dir permission
       run: |
-        sudo chown -R cvmfs.cvmfs /var/lib/cvmfs
-        sudo chmod -R go-rwx /var/lib/cvmfs
+        sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
+        sudo chmod -R 700 /var/lib/cvmfs
         
     - name: Pull current Docker image
       run: docker image pull eflumerf/mu2e-spack:latest
@@ -132,4 +136,4 @@ jobs:
 
     - name: change dir permission again
       run: |
-        sudo chmod -R go+rwx /var/lib/cvmfs
+        sudo chmod -R 777 /var/lib/cvmfs
