@@ -99,18 +99,32 @@ jobs:
             cd ..
         done
                 
+        export OTS_DOXY="DOIT"
         # Have to re-add here in case architecture is different
         cd /opt/mu2edaq
         #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
         
+        # Cleanup old docs
+        rm -rf build/*/doc
+
         echo "Starting build"
         spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/Mu2e/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/Mu2e/build.log
+        
+        echo "Collecting Doxygen"
+        mkdir -p /scratch/Mu2e/docs && rm -rf /scratch/Mu2e/docs/*
+        for dir in build/*/doc/html;do
+            thispkg=\`echo \$dir|sed 's|build/||;s|/doc/html||'\`
+            echo "Copying \$dir to /scratch/Mu2e/docs/\$thispkg"
+            cp -a \$dir /scratch/Mu2e/docs/\$thispkg
+        done
+        echo "Contents of docs after collection"
+        ls /scratch/Mu2e/docs
 
         exit \$res
         EOT
@@ -122,13 +136,18 @@ jobs:
       run: |
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log
 
+    - name: upload build log file
+      uses: actions/upload-artifact@main
+      with:
+        name: build_log
+        path: ${{ github.workspace }}/scratch/Mu2e/build.log
+
+    - name: upload Doxygen docs
+      uses: actions/upload-artifact@main
+      with:
+        name: doxygen
+        path: ${{ github.workspace }}/scratch/Mu2e/docs
+
     - name: change dir permission again
       run: |
         sudo chmod -R 777 /var/lib/cvmfs
-       
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: build-log
-        path: scratch/Mu2e/build.log
