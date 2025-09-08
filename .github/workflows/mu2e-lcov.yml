@@ -1,0 +1,147 @@
+name: Create Mu2e LCOV coverage report
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  schedule:
+    - cron: "0 1 * * 4"
+
+  workflow_dispatch:
+
+jobs:
+  make_lcov_report:
+    name: make_lcov_report
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Delete huge unnecessary tools folder
+      run: rm -rf /opt/hostedtoolcache
+
+    - name: SUID for tar
+      run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
+
+    - uses: cvmfs-contrib/github-action-cvmfs@main
+
+    - name: test cvmfs
+      run: |
+        ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
+    
+    - name: Checkout pkg
+      uses: actions/checkout@main
+      with:
+        repository: Mu2e/otsdaq-mu2e
+        path: scratch/Mu2e/otsdaq-mu2e
+        fetch-depth: 0
+
+    - name: Fetch package version
+      id: version
+      run: |
+        cd $GITHUB_WORKSPACE/scratch/Mu2e/otsdaq-mu2e
+        tag=`git describe --tags --abbrev=0`
+        echo "Using tag $tag"
+        echo "tag=${tag}" >>$GITHUB_OUTPUT
+
+    - name: change dir permission
+      run: |
+        sudo mkdir -p /var/lib/cvmfs
+        sudo chmod -R 777 /var/lib/cvmfs
+
+    - name: Cache cvmfs cache
+      id: cvmfs_cache
+      uses: actions/cache@main
+      with:
+        path: /var/lib/cvmfs/shared
+        key: cachecvmfs-${{ steps.version.outputs.tag }}
+
+    - name: restore dir permission
+      run: |
+        sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
+        sudo chmod -R 700 /var/lib/cvmfs
+
+    - name: Pull current Docker image
+      run: docker image pull eflumerf/mu2e-spack:latest
+
+    - name: run build in docker container with cvmfs bind mount
+      run: |
+      
+        cd $GITHUB_WORKSPACE/scratch
+        cat << EOT > build_pkg.sh
+        #!/bin/bash
+        
+        cd /opt/mu2edaq
+        source /opt/mu2edaq/setup_ots.sh || exit 1
+        
+        spack load lcov
+        
+        branch=develop
+
+        echo "Checking out \$branch"
+        cd  /opt/otsdaq/srcs
+        for pkg in */;do 
+            echo "Updating package \$pkg"
+            cd \$pkg
+            git stash
+            git checkout \$branch
+            git stash pop
+            git pull
+            cd ..
+        done
+                
+        export OTS_DOXY="DOIT"
+        # Have to re-add here in case architecture is different
+        cd /opt/mu2edaq
+        #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
+        spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
+        export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
+        export USE_GCOV=1
+        
+        echo "Starting build"
+        sed -i 's/RelWithDebInfo/Debug/g' srcs/CMakePresets.json
+        spack mpd build -G Ninja -j\$CETPKG_J --clean 2>&1 | tee -a /scratch/Mu2e/build.log
+        res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
+        
+        echo "Spack install completed with status code \$res"
+        echo "Spack install completed with status code \$res" >>/scratch/Mu2e/build.log
+        
+        echo "Collecting coverage data"
+        lcov -d build --zerocounters
+        lcov -c --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --keep-going -i -d build -o otsdaq.base
+
+        spack mpd test
+        
+        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --capture --output-file otsdaq.info
+        lcov -a otsdaq.base -a otsdaq.info --output-file otsdaq.total
+        lcov --remove otsdaq.total --ignore-errors unused,unused '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file otsdaq.info.cleaned
+        genhtml -o coverage otsdaq.info.cleaned
+
+        mv coverage /scratch/Mu2e
+        
+        exit \$res
+        EOT
+        chmod +x build_pkg.sh
+        
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/mu2e-spack:latest /scratch/build_pkg.sh
+        
+    - name: Check build log for success
+      run: |
+        grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log
+
+    - name: upload build log file
+      uses: actions/upload-artifact@main
+      with:
+        if-no-files-found: error
+        name: build_log
+        path: ${{ github.workspace }}/scratch/Mu2e/build.log
+
+    - name: upload coverage
+      uses: actions/upload-artifact@main
+      with:
+        if-no-files-found: error
+        name: code_coverage
+        path: ${{ github.workspace }}/scratch/Mu2e/coverage
+
+    - name: change dir permission again
+      run: |
+        sudo chmod -R 777 /var/lib/cvmfs
