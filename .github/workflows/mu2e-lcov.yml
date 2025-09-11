@@ -78,7 +78,7 @@ jobs:
         branch=develop
 
         echo "Checking out \$branch"
-        cd  /opt/otsdaq/srcs
+        cd  /opt/mu2edaq/srcs
         for pkg in */;do 
             echo "Updating package \$pkg"
             cd \$pkg
@@ -107,15 +107,15 @@ jobs:
         
         echo "Collecting coverage data"
         lcov -d build --zerocounters
-        lcov -c --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --keep-going -i -d build -o otsdaq.base
+        lcov -c --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --keep-going -i -d build -o mu2edaq.base
 
         spack mpd test
         
-        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --capture --output-file otsdaq.info
-        lcov -a otsdaq.base -a otsdaq.info --output-file otsdaq.total
-        lcov --remove otsdaq.total --ignore-errors unused,unused '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' --output-file otsdaq.info.cleaned
-        genhtml -o coverage otsdaq.info.cleaned
-
+        lcov -d build --ignore-errors mismatch,mismatch --ignore-errors gcov,gcov --ignore-errors negative,negative --capture --output-file mu2edaq.info
+        lcov -a mu2edaq.base -a mu2edaq.info --output-file mu2edaq.total
+        lcov --remove mu2edaq.total --ignore-errors unused,unused '/cvmfs/*' 'boost/*' '*/spack/opt/spack/*' '*/spack/var/spack/*' '/usr/include/curl/*' 'artdaq-database/built-in/*' --output-file mu2edaq.info.cleaned
+        genhtml -o coverage mu2edaq.info.cleaned
+        
         mv coverage /scratch/Mu2e
         
         exit \$res
