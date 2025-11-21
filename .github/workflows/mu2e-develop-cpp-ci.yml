@@ -14,7 +14,10 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: Delete huge unnecessary tools folder
-      run: rm -rf /opt/hostedtoolcache
+      run: |
+        rm -rf /opt/hostedtoolcache
+        df -h
+        du -sh / | sort -h
 
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
