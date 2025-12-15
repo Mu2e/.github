@@ -103,6 +103,10 @@ jobs:
             make test 2>&1 | tee -a /scratch/Mu2e/build.log
             res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
         fi
+        
+        echo "Copying testing logs"
+        mkdir -p /scratch/Mu2e/Testing
+        cp /scratch/Mu2e/build_\$REPO/Testing/Temporary/*.log /scratch/Mu2e/Testing
 
         exit \$res
         EOT
@@ -122,6 +126,14 @@ jobs:
         name: build_log
         path: ${{ github.workspace }}/scratch/Mu2e/build.log
 
+    - name: Upload testing log file(s)
+      if: always()
+      uses: actions/upload-artifact@main
+      with:
+        name: test_logs
+        path: ${{ github.workspace }}/scratch/Mu2e/Testing
+
     - name: change dir permission again
+      if: always()
       run: |
         sudo chmod -R 777 /var/lib/cvmfs

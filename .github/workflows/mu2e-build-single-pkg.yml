@@ -120,5 +120,6 @@ jobs:
         path: ${{ github.workspace }}/scratch/Mu2e/build.log
 
     - name: change dir permission again
+      if: always()
       run: |
         sudo chmod -R 777 /var/lib/cvmfs
