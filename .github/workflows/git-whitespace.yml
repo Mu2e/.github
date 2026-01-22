@@ -75,7 +75,9 @@ jobs:
                || "\$ext" == "C" ||  "\$ext" == "h" || "\$ext" == "icc" \
                || "\$ext" == "mac" || "\$ext" == "sh" || "\$ext" == "py" || "\$ext" == "pl" \
                || "\$bname" == "SConscript" \
-               || "\$name" =~ \$geomReg1 || "\$name" =~ \$geomReg2 ]]; then
+               || "\$name" =~ \$geomReg1 || "\$name" =~ \$geomReg2 \
+               || "\$ext" == "html" || "\$ext" == "htm" || "\$ext" == "js" || "\$ext" == "css" \
+               ]]; then
 
                 # check whitespace and return non-zero if not allowed
             
