@@ -85,7 +85,9 @@ jobs:
                || "\$name" =~ "CMakeLists.txt" || "\$ext" == "yml" || "\$ext" == "yaml" \
                || "\$ext" == "html" || "\$ext" == "htm" || "\$ext" == "js" || "\$ext" == "css" \
                || "\$bname" == "SConscript" \
-               || "\$name" =~ \$geomReg1 || "\$name" =~ \$geomReg2 ]]; then
+               || "\$name" =~ \$geomReg1 || "\$name" =~ \$geomReg2 \
+               || "\$ext" == "html" || "\$ext" == "htm" || "\$ext" == "js" || "\$ext" == "css" \
+               ]]; then
 
                 # check whitespace and return non-zero if not allowed
 
