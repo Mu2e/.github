@@ -18,7 +18,7 @@ jobs:
       run: |
         # Space usage before cleanup
         df -h /
- 
+
         # Remove unused tool caches (comment any required ones with #)
         sudo rm -rf /usr/lib/jvm
         sudo rm -rf /usr/local/.ghcup
@@ -27,7 +27,7 @@ jobs:
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /usr/share/swift
         sudo rm -rf "$AGENT_TOOLSDIRECTORY"
- 
+
         # Verify gains
         df -h /
 
@@ -39,7 +39,7 @@ jobs:
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
-    
+
     - name: Checkout pkg
       uses: actions/checkout@main
       with:
@@ -71,20 +71,20 @@ jobs:
       run: |
         sudo chown -R cvmfs:cvmfs /var/lib/cvmfs
         sudo chmod -R 700 /var/lib/cvmfs
-        
+
     - name: Pull current Docker image
       run: docker image pull eflumerf/mu2e-spack:latest
 
     - name: run build in docker container with cvmfs bind mount
       run: |
-      
+
         cd $GITHUB_WORKSPACE/scratch
         cat << EOT > build_pkg.sh
         #!/bin/bash
-        
+
         cd /opt/mu2edaq
         source /opt/mu2edaq/setup_ots.sh || exit 1
-        
+
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         export pkgname=\${REPO//_/-}
         echo "Copying /scratch/Mu2e/\$REPO to srcs \$pkgname"
@@ -96,7 +96,7 @@ jobs:
         export ref=\$(git describe --all)
         echo "Described current ref as \${ref}"
         branch=develop
-        
+
         if [[ "x\${ref}" =~ "xheads/" ]]; then
             echo "Setting branch to \${ref//heads\//}"
             branch=\${ref//heads\//}
@@ -104,7 +104,7 @@ jobs:
 
         echo "Checking out \$branch"
         cd  /opt/mu2edaq/srcs
-        for pkg in */;do 
+        for pkg in */;do
             echo "Updating package \$pkg"
             cd \$pkg
             git stash
@@ -113,24 +113,24 @@ jobs:
             git pull
             cd ..
         done
-                
+
         export OTS_DOXY="DOIT"
         # Have to re-add here in case architecture is different
         cd /opt/mu2edaq
         #spack config add config:mpd_user_dir:/opt/mu2edaq/spack-repos/mpd/
         spack mpd init -r site -u /opt/mu2edaq/spack-repos/mpd
         export CETPKG_J=\$((`cat /proc/cpuinfo|grep processor|tail -1|awk '{print $3}'` + 1))
-        
+
         # Cleanup old docs
         rm -rf build/*/doc
 
         echo "Starting build"
         spack mpd build -G Ninja -j\$CETPKG_J 2>&1 | tee -a /scratch/Mu2e/build.log
         res=\${PIPESTATUS[0]} # Get result of first command in previous pipe, bash specific
-        
+
         echo "Spack install completed with status code \$res"
         echo "Spack install completed with status code \$res" >>/scratch/Mu2e/build.log
-        
+
         echo "Collecting Doxygen"
         mkdir -p /scratch/Mu2e/docs && rm -rf /scratch/Mu2e/docs/*
         for dir in build/*/doc/html;do
@@ -146,7 +146,7 @@ jobs:
         chmod +x build_pkg.sh
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/mu2e-spack:latest /scratch/build_pkg.sh
-        
+
     - name: Check build log for success
       run: |
         grep "Spack install completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log
