@@ -130,7 +130,7 @@ jobs:
         fi
 
         # Setup Spack environment and load required packages
-        source /opt/otsdaq/setup-env.sh || exit 1
+        source /opt/mu2edaq/setup-env.sh || exit 1
         spack load --first llvm
         spack load --first py-black
 
