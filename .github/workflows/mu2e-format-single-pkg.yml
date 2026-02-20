@@ -78,7 +78,7 @@ jobs:
         sudo chmod -R 700 /var/lib/cvmfs
 
     - name: Pull current Docker image
-      run: docker image pull ghcr.io/mu2e/mu2e-spack:latest
+      run: docker image pull eflumerf/mu2e-spack:latest
 
     - name: run clang-format in docker container with cvmfs bind mount
       run: |
@@ -182,7 +182,7 @@ jobs:
         EOT
         chmod +x format_pkg.sh
 
-        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch ghcr.io/mu2e/mu2e-spack:latest /scratch/format_pkg.sh
+        docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/mu2e-spack:latest /scratch/format_pkg.sh
 
     - name: Check build log for clang-format success
       run: |
