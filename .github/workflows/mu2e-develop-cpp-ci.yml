@@ -130,7 +130,7 @@ jobs:
 
         if [ \$res -eq 0 ]; then
           cd build
-          ninjs install 2>&1 | tee -a /scratch/Mu2e/build.log
+          ninja install 2>&1 | tee -a /scratch/Mu2e/build.log
           res=\${PIPESTATUS[0]}
         fi
 
