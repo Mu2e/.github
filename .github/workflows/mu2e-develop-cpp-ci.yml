@@ -141,7 +141,7 @@ jobs:
         echo "Collecting Doxygen"
         mkdir -p /scratch/Mu2e/docs && rm -rf /scratch/Mu2e/docs/*
         for dir in /opt/mu2edaq/build/*/doc/html;do
-            thispkg=\`echo \$dir|sed 's|build/||;s|/doc/html||'\`
+            thispkg=\`echo \$dir|sed 's|/opt/mu2edaq/build/||;s|/doc/html||'\`
             echo "Copying \$dir to /scratch/Mu2e/docs/\$thispkg"
             cp -a \$dir /scratch/Mu2e/docs/\$thispkg
         done
