@@ -134,8 +134,6 @@ jobs:
 
         docker run --rm -v /cvmfs:/cvmfs:shared -v $GITHUB_WORKSPACE/scratch:/scratch eflumerf/mu2e-spack:latest /scratch/build_pkg.sh
 
-    - name: Check build log for success
-      run: |
         grep "Clang-tidy completed with status code 0" ${{ github.workspace }}/scratch/Mu2e/build.log ||
         grep "No changed files" ${{ github.workspace }}/scratch/Mu2e/build.log
 
