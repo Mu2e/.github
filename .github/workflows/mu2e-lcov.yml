@@ -37,14 +37,14 @@ jobs:
     - name: SUID for tar
       run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
 
-    - uses: cvmfs-contrib/github-action-cvmfs@d93d881391926e8146776c13345c3e23d6393acd
+    - uses: cvmfs-contrib/github-action-cvmfs@72f2a8d366043978d6aebee154bc9ed321c2f2a8
 
     - name: test cvmfs
       run: |
         ls -l /cvmfs/fermilab.opensciencegrid.org/products/artdaq/spack_areas
 
     - name: Checkout pkg
-      uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       with:
         repository: Mu2e/otsdaq-mu2e
         path: scratch/Mu2e/otsdaq-mu2e
@@ -65,7 +65,7 @@ jobs:
 
     - name: Cache cvmfs cache
       id: cvmfs_cache
-      uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae
+      uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9
       with:
         path: /var/lib/cvmfs/shared
         key: cachecvmfs-${{ steps.version.outputs.tag }}
