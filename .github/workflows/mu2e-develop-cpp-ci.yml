@@ -105,6 +105,10 @@ jobs:
         echo "Checking out \$branch"
         cd  /opt/mu2edaq/srcs
         for pkg in */;do
+            if [ "x\$pkg" == "x\$pkgname/" ]; then
+                echo "Skipping \$pkgname"
+                continue
+            fi
             echo "Updating package \$pkg"
             cd \$pkg
             git stash
