@@ -87,7 +87,10 @@ jobs:
 
         export REPO=$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')
         export pkgname=\${REPO//_/-}
-        echo "Copying /scratch/Mu2e/\$REPO to srcs \$pkgname"
+        if [ "x\$pkgname" == "xtdaq-offline" ]; then
+            pkgname=Offline
+        fi
+        echo "Copying /scratch/Mu2e/\$REPO to srcs/\$pkgname"
         cd srcs
         if [ -d \$pkgname ];then mv \$pkgname{,.bak}; fi
         cp -pr /scratch/Mu2e/\$REPO \$pkgname
