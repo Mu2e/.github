@@ -97,13 +97,15 @@ jobs:
         cd \$pkgname
         git config --global --add safe.directory \$PWD
         export ref=\$(git describe --all)
-        echo "Described current ref as \${ref}"
-        branch=develop
+        branch=\$(git branch --show-current)
+        export ref=\$(git describe --all)
+        echo "Branch is \${branch}, Described current ref as \${ref}"
 
-        if [[ "x\${ref}" =~ "xheads/" ]]; then
+        if [[ "x\${branch}" == "x" ]] && [[ "x\${ref}" =~ "xheads/" ]]; then
             echo "Setting branch to \${ref//heads\//}"
             branch=\${ref//heads\//}
         fi
+        branch=\${branch:-develop}
 
         echo "Checking out \$branch"
         cd  /opt/mu2edaq/srcs
